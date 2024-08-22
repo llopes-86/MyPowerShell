@@ -1,0 +1,33 @@
+<#
+.SYNOPSIS
+Retrieves the client's IP address from the Zscaler IP detection page.
+
+.DESCRIPTION
+This script sends a GET request to the Zscaler IP detection page and extracts the client's IP address from the response.
+
+.PARAMETER None
+
+.EXAMPLE
+Get-ZscalerIP
+
+# Returns the client's IP address as a string
+
+.NOTES
+This script assumes that the Zscaler IP detection page is reachable and returns a JSON response.
+
+.LINK
+https://ip.zscaler.com/
+#>
+
+try {
+    $url = Invoke-WebRequest "http://ip.zscaler.com/"
+} catch {
+    Write-Host -f Red "Page not found: " $_.Exception.Message
+    return
+}
+
+if ($url.StatusCode -eq '200') {
+    ($url.InputFields.value | ConvertFrom-Json | select -exp srcip)
+} else {
+    Write-Output "Page did not respond"
+}
